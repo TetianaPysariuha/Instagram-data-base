@@ -13,5 +13,5 @@ export const userSchemaUpdate = Joi.object({
     avatar: Joi.string(),
     nik: Joi.string().min(3).max(20),
     name: Joi.string().min(3).max(30),
-    followBy : Joi.array().items(Joi.string()).default([])
+    followBy : Joi.array().items(Joi.string()),
 });

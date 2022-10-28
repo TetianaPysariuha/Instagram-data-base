@@ -13,13 +13,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    followBy : [String],
+    followBy: [String],
 });
 
 const Users = mongoose.model('users', userSchema);
 
 export const getUsersData = async () => {
-    const data = await Users.find({ });
+    const data = await Users.find({});
     return data;
 };
 
@@ -29,18 +29,19 @@ export const getUserDataById = async (id) => {
 }
 
 export const postNewUser = async (data) => {
+    console.log(data);
     const newUser = await new Users(data).save();
     return newUser;
 }
 
 export const updateUserDataById = async (id, data) => {
     await Users.findByIdAndUpdate(id, data);
-    const newData = await Users.find({ });
+    const newData = await Users.find({});
     return newData;
 }
 
 export const deleteUserDataById = async (id) => {
     await Users.findByIdAndDelete(id);
-    const newData = await Users.find({ });
+    const newData = await Users.find({});
     return newData;
 }
