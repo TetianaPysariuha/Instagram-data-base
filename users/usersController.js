@@ -70,12 +70,24 @@ export const editUserById = async (req, res) => {
 export const deleteUserById = async (req, res) => {
     try {
         if (await getUserDataById(req.params.id)) {
-            await getPostsDataByUserId(req.params.id);
+            const posts = await getPostsDataByUserId(req.params.id);
+            posts.forEach((el) => deletePostsDataByUserId((req.params.id)));
+            await deleteUserDataById(req.params.id);
             const data = await getAllUsers();
             res.json({ status: 'success', data: data });
         } else {
             res.status(400).json({ status: 'error', message: `User with id = ${req.params.id} does not exist` });
         }
+    } catch (err) {
+        res.status(400).json({ status: 'error', message: err.message });
+    }
+};
+
+export const getSubscribersByUserId = async (req, res) =>{
+    try{
+        const data = await getAllUsers();
+        const subsribers = data.filter((el) => el.followBy.includes(req.params.id));
+        res.json({ status: 'success', data: subsribers });
     } catch (err) {
         res.status(400).json({ status: 'error', message: err.message });
     }

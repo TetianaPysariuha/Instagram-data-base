@@ -14,8 +14,8 @@ app.use(cors());
 app.use('/users', usersRouter);
 app.use('/posts', postsRouter);
 app.use(express.static(resolve('static')))
-/* 
-app.post('/users', (req, res)=>{
+
+/* app.get('/users', (req, res)=>{
     console.log(req.body);
     res.json({status: 'success'})
 }) */

@@ -85,7 +85,7 @@ export const editPostById = async (req, res)=>{
         const data = await getAllPosts();
         res.json({status: 'success', data: data});
     } catch (err) {
-        res.status(400).json({status: 'error', message: err.message});
+        res.status(400).json({status: 'error', message: err?.message});
     }
 };
 
@@ -95,6 +95,6 @@ export const deletePostById = async (req, res)=>{
         const data = await getAllPosts();
         res.json({status: 'success', data: data});
     } catch (err) {
-        res.status(400).json({status: 'error', message: err.message});
+        res.status(400).json({status: 'error', message: err?.message});
     }
 };
