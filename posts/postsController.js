@@ -8,20 +8,25 @@ import {
 } from "./postsDataLayer.js";
 import { getUsersData, getUserDataById } from "../users/usersDataLayer.js";
 
+const getAllPosts = async () =>{
+    const posts = await getPostsData();
+    const users = await getUsersData();
+    if (posts) {
+        const newPosts = posts.map(({_doc: post}) => {
+            const filteredUser = users.filter(user => user._id.valueOf()=== post.userid);
+            post.user = filteredUser[0];
+            return post;
+        }); 
+        return newPosts;
+    } else {
+        return [];
+    }
+};
+
 export const getPosts = async (req, res)=>{
     try{
-        const posts = await getPostsData();
-        const users = await getUsersData();
-        if (posts) {
-            const newPosts = posts.map(({_doc: post}) => {
-                const filteredUser = users.filter(user => user._id.valueOf()=== post.userid);
-                post.user = filteredUser[0];
-                return post;
-            }); 
-            res.json({status: 'success', data: newPosts});
-        } else {
-            res.json({status: 'success', data: []});
-        }
+        const data = await getAllPosts();
+        res.json({status: 'success', data: data});
     } catch (err) {
         res.status(400).json({status: 'error', message: err.message});
     }
@@ -76,8 +81,9 @@ export const addNewPost = async (req, res)=>{
 
 export const editPostById = async (req, res)=>{
     try {
-        const data = await updatePostDataById(req.params.id, req.body);
-        res.json({status: 'success', data});
+        await updatePostDataById(req.params.id, req.body);
+        const data = await getAllPosts();
+        res.json({status: 'success', data: data});
     } catch (err) {
         res.status(400).json({status: 'error', message: err.message});
     }
@@ -85,8 +91,9 @@ export const editPostById = async (req, res)=>{
 
 export const deletePostById = async (req, res)=>{
     try{
-        const data = await deletePostDataById(req.params.id);
-        res.json({status: 'success', data});
+        await deletePostDataById(req.params.id);
+        const data = await getAllPosts();
+        res.json({status: 'success', data: data});
     } catch (err) {
         res.status(400).json({status: 'error', message: err.message});
     }

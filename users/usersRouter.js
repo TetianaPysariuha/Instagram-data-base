@@ -3,7 +3,6 @@ import { getUsers, getUserById, addNewUser, editUserById, deleteUserById } from 
 import joiValidator from 'express-joi-validation';
 import {userSchemaAdd, userSchemaUpdate} from './usersSchema.js';
 
-
 const validator = joiValidator.createValidator();
 const usersRouter = Router();
 
