@@ -29,7 +29,6 @@ export const getUserDataById = async (id) => {
 }
 
 export const postNewUser = async (data) => {
-    console.log(data);
     const newUser = await new Users(data).save();
     return newUser;
 }

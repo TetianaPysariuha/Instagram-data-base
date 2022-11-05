@@ -7,10 +7,11 @@ const DB_URL = 'mongodb+srv://Admin:StepInstagram@cluster0.yxexamv.mongodb.net/i
 mongoose.connect(DB_URL, (err)=>{
     if(err) {
         console.log(err);
+    } else {
+        console.log('--------------------------------------------------')
+        console.log(`Connection to DB is done`);
+        console.log('--------------------------------------------------')
     }
-    console.log('--------------------------------------------------')
-    console.log(`Connection to DB is done`);
-    console.log('--------------------------------------------------')
 })
 
 app.listen(PORT, () => {

@@ -26,6 +26,9 @@ const getAllPosts = async () =>{
 export const getPosts = async (req, res)=>{
     try{
         const data = await getAllPosts();
+        if(req.body.quantity) {
+            data.splice(req.body.quantity)
+        }
         res.json({status: 'success', data: data});
     } catch (err) {
         res.status(400).json({status: 'error', message: err.message});
@@ -65,6 +68,33 @@ export const getPostsByUserId = async (req, res)=>{
     }
 };
 
+export const getPostsStrictQuantity = async (req, res)=>{
+    try{
+        const allData = await getAllPosts();
+        const filteredData = req.params.userId ? allData.filter(post => post.userid !== req.params.userId) : [...allData];
+        const totalCount = filteredData.length;
+        if (req.params.start >= totalCount) {
+            res.json({status: 'success', data: [], totalCount: totalCount});
+        } else {
+            const end =  totalCount < req.params.end ? totalCount : req.params.end;
+            const data = filteredData.slice(req.params.start, req.params.end);
+            res.json({status: 'success', data: data, totalCount: totalCount});
+        }
+    } catch (err) {
+        res.status(400).json({status: 'error', message: err.message});
+    }
+};
+
+export const getFavoritePostsByUserId = async (req, res)=>{
+    try{
+        const allData = await getAllPosts();
+        const filteredData = req.params.userId ? allData.filter(post => post.favorite.includes(req.params.userId)) : [];
+        res.json({status: 'success', data: filteredData});
+    } catch (err) {
+        res.status(400).json({status: 'error', message: err.message});
+    }
+};
+
 export const addNewPost = async (req, res)=>{
     try{
         const user = await getUserDataById(req.body.userid);
@@ -82,8 +112,15 @@ export const addNewPost = async (req, res)=>{
 export const editPostById = async (req, res)=>{
     try {
         await updatePostDataById(req.params.id, req.body);
-        const data = await getAllPosts();
-        res.json({status: 'success', data: data});
+        const post = await getPostDataById(req.params.id);
+        const user = await getUserDataById(post._doc.userid);
+        if (post) {
+            const newPost = post._doc;
+            newPost.user = user._doc;
+            res.json({status: 'success', data: newPost});
+        }
+/*         const data = await getAllPosts(); */
+/*         res.json({status: 'success', data: data}); */
     } catch (err) {
         res.status(400).json({status: 'error', message: err?.message});
     }
@@ -91,8 +128,8 @@ export const editPostById = async (req, res)=>{
 
 export const deletePostById = async (req, res)=>{
     try{
-        await deletePostDataById(req.params.id);
-        const data = await getAllPosts();
+        const data = await deletePostDataById(req.params.id);
+/*         const data = await getAllPosts(); */
         res.json({status: 'success', data: data});
     } catch (err) {
         res.status(400).json({status: 'error', message: err?.message});
