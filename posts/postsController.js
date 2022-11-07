@@ -26,9 +26,6 @@ const getAllPosts = async () =>{
 export const getPosts = async (req, res)=>{
     try{
         const data = await getAllPosts();
-        if(req.body.quantity) {
-            data.splice(req.body.quantity)
-        }
         res.json({status: 'success', data: data});
     } catch (err) {
         res.status(400).json({status: 'error', message: err.message});
@@ -43,8 +40,9 @@ export const getPostById = async (req, res)=>{
             const newPost = post._doc;
             newPost.user = user._doc;
             res.json({status: 'success', data: newPost});
-        }
-        res.json({status: 'success', data: []});
+        } else (  
+            res.json({status: 'success', data: []})
+        )
     } catch (err) {
         res.status(400).json({status: 'error', message: err.message});
     }
@@ -118,9 +116,9 @@ export const editPostById = async (req, res)=>{
             const newPost = post._doc;
             newPost.user = user._doc;
             res.json({status: 'success', data: newPost});
+        } else{
+            res.json({status: 'success', data: []});
         }
-/*         const data = await getAllPosts(); */
-/*         res.json({status: 'success', data: data}); */
     } catch (err) {
         res.status(400).json({status: 'error', message: err?.message});
     }
@@ -129,7 +127,6 @@ export const editPostById = async (req, res)=>{
 export const deletePostById = async (req, res)=>{
     try{
         const data = await deletePostDataById(req.params.id);
-/*         const data = await getAllPosts(); */
         res.json({status: 'success', data: data});
     } catch (err) {
         res.status(400).json({status: 'error', message: err?.message});
