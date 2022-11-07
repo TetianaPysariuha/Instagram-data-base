@@ -15,8 +15,8 @@ app.use('/users', usersRouter);
 app.use('/posts', postsRouter);
 app.use(express.static(resolve('static')))
 
-/* app.get('/', (req, res)=>{
-    console.log(req.url);
+/* app.get('/users', (req, res)=>{
+    console.log(req.body);
     res.json({status: 'success'})
 }) */
 

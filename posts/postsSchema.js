@@ -20,6 +20,6 @@ export const postSchemaUpdate = Joi.object({
     description: Joi.string(),
     likes: Joi.array().items(Joi.string()),
     favorite : Joi.array().items(Joi.string()),
-    comments: Joi.array().items(Joi.object({userId: Joi.string(), text: Joi.string()})),
+    comments: Joi.array().items(Joi.object({userId: Joi.string(), text: Joi.string(), _id: Joi.string()})),
     seeCount: Joi.number()
 });

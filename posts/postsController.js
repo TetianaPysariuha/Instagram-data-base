@@ -8,20 +8,25 @@ import {
 } from "./postsDataLayer.js";
 import { getUsersData, getUserDataById } from "../users/usersDataLayer.js";
 
+const getAllPosts = async () =>{
+    const posts = await getPostsData();
+    const users = await getUsersData();
+    if (posts) {
+        const newPosts = posts.map(({_doc: post}) => {
+            const filteredUser = users.filter(user => user._id.valueOf()=== post.userid);
+            post.user = filteredUser[0];
+            return post;
+        }); 
+        return newPosts;
+    } else {
+        return [];
+    }
+};
+
 export const getPosts = async (req, res)=>{
     try{
-        const posts = await getPostsData();
-        const users = await getUsersData();
-        if (posts) {
-            const newPosts = posts.map(({_doc: post}) => {
-                const filteredUser = users.filter(user => user._id.valueOf()=== post.userid);
-                post.user = filteredUser[0];
-                return post;
-            }); 
-            res.json({status: 'success', data: newPosts});
-        } else {
-            res.json({status: 'success', data: []});
-        }
+        const data = await getAllPosts();
+        res.json({status: 'success', data: data});
     } catch (err) {
         res.status(400).json({status: 'error', message: err.message});
     }
@@ -35,8 +40,9 @@ export const getPostById = async (req, res)=>{
             const newPost = post._doc;
             newPost.user = user._doc;
             res.json({status: 'success', data: newPost});
-        }
-        res.json({status: 'success', data: []});
+        } else (  
+            res.json({status: 'success', data: []})
+        )
     } catch (err) {
         res.status(400).json({status: 'error', message: err.message});
     }
@@ -60,6 +66,33 @@ export const getPostsByUserId = async (req, res)=>{
     }
 };
 
+export const getPostsStrictQuantity = async (req, res)=>{
+    try{
+        const allData = await getAllPosts();
+        const filteredData = req.params.userId ? allData.filter(post => post.userid !== req.params.userId) : [...allData];
+        const totalCount = filteredData.length;
+        if (req.params.start >= totalCount) {
+            res.json({status: 'success', data: [], totalCount: totalCount});
+        } else {
+            const end =  totalCount < req.params.end ? totalCount : req.params.end;
+            const data = filteredData.slice(req.params.start, req.params.end);
+            res.json({status: 'success', data: data, totalCount: totalCount});
+        }
+    } catch (err) {
+        res.status(400).json({status: 'error', message: err.message});
+    }
+};
+
+export const getFavoritePostsByUserId = async (req, res)=>{
+    try{
+        const allData = await getAllPosts();
+        const filteredData = req.params.userId ? allData.filter(post => post.favorite.includes(req.params.userId)) : [];
+        res.json({status: 'success', data: filteredData});
+    } catch (err) {
+        res.status(400).json({status: 'error', message: err.message});
+    }
+};
+
 export const addNewPost = async (req, res)=>{
     try{
         const user = await getUserDataById(req.body.userid);
@@ -76,18 +109,26 @@ export const addNewPost = async (req, res)=>{
 
 export const editPostById = async (req, res)=>{
     try {
-        const data = await updatePostDataById(req.params.id, req.body);
-        res.json({status: 'success', data});
+        await updatePostDataById(req.params.id, req.body);
+        const post = await getPostDataById(req.params.id);
+        const user = await getUserDataById(post._doc.userid);
+        if (post) {
+            const newPost = post._doc;
+            newPost.user = user._doc;
+            res.json({status: 'success', data: newPost});
+        } else{
+            res.json({status: 'success', data: []});
+        }
     } catch (err) {
-        res.status(400).json({status: 'error', message: err.message});
+        res.status(400).json({status: 'error', message: err?.message});
     }
 };
 
 export const deletePostById = async (req, res)=>{
     try{
         const data = await deletePostDataById(req.params.id);
-        res.json({status: 'success', data});
+        res.json({status: 'success', data: data});
     } catch (err) {
-        res.status(400).json({status: 'error', message: err.message});
+        res.status(400).json({status: 'error', message: err?.message});
     }
 };
