@@ -22,3 +22,5 @@ yarn-error.log*
 
 #other
 data.js
+
+/*.env
